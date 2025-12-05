@@ -15,7 +15,7 @@ Il permet également d’envoyer les réponses via Gmail et Telegram, et de gér
 - [n8n](https://n8n.io)  
 - [Telegram API](https://core.telegram.org/bots/api)  
 - [Gmail API](https://developers.google.com/gmail/api)  
-- [LangChain](https://www.langchain.com/) / OpenAI  
+- OpenAI  
 - Python (intégration et scripts)
 
 ## Outils
