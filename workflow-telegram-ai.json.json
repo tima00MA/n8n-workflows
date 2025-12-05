@@ -1,0 +1,407 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1024,
+        896
+      ],
+      "id": "25672034-e2d1-423c-8c20-07698c42dd0e",
+      "name": "Telegram Trigger",
+      "webhookId": "232e25e8-185c-4ee9-a436-bd2698b5ccb1",
+      "credentials": {
+        "telegramApi": {
+          "id": "fWzLx54QD8ml9477",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text || $json.text }}",
+        "options": {
+          "systemMessage": "You are a professional email-writing assistant.\nYour job is to write clear, concise, respectful, and well-structured emails **from Fatima**.\n\nRules:\n1. Tone: professional, confident, polite.\n2. Structure:\n   - Greeting\n   - Short context\n   - Message or request\n   - Optional call to action\n   - Closing + signature (Fatima)\n3. Use short paragraphs.\n4. Adapt to the user’s field (business, tech, HR, etc.).\n5. If the user asks for another language, write in that language.\n6. If not specified, write in English.\n7. Detect if the user message contains phrases like \"create an email\", \"send an email\", or \"write an email\". \n   - If yes, **generate the email** following the rules above.\n   - At the end of the email, always add this message:\n     \"Confirmation: The email has been generated and is ready to be sent.\"\n8. Do not generate emails if the user message does not indicate sending or creating an email.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        160,
+        896
+      ],
+      "id": "815f2017-1862-4afb-9769-c042b66cf9fa",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        1120
+      ],
+      "id": "ce0f2338-7107-4f1f-9faa-8f0c09e1af68",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "8ThTVSFMrcYRViiI",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        896
+      ],
+      "id": "9cb0d598-1391-4dbf-b2f4-9bfd2fd9510e",
+      "name": "Send a text message",
+      "webhookId": "63342f8b-03bc-4f9a-a79b-d20f6c4ea7d5",
+      "credentials": {
+        "telegramApi": {
+          "id": "fWzLx54QD8ml9477",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        1120
+      ],
+      "id": "7c8a6e91-7926-44f0-828e-b4d250f2ba25",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Fatima Ait Lamine"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        1120
+      ],
+      "id": "ac5ff32d-6afd-49c5-b15e-5a4480584f8f",
+      "name": "Send a message in Gmail",
+      "webhookId": "7eef4cb7-f952-4c54-80df-7c80294e9807",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "AxV9Nm4S6UTzfYln",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "212e59d5-930e-4172-9316-2067b941a9f4",
+              "leftValue": "={{ $json.message.voice }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        896
+      ],
+      "id": "0236f35c-0bfc-45fe-b5e9-d3575795804c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -576,
+        816
+      ],
+      "id": "946791c6-bbf4-42b8-a12d-ab6aefa7ee1f",
+      "name": "Get a file",
+      "webhookId": "109f35a4-d188-4cf7-998e-ae0f567693f1",
+      "credentials": {
+        "telegramApi": {
+          "id": "fWzLx54QD8ml9477",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        816
+      ],
+      "id": "41fa4179-4298-4251-9058-c4b6205969c0",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "8ThTVSFMrcYRViiI",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "message.text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "message.chat.id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "51707fca-c9d2-4774-882a-3a9e2fcef4ae",
+      "name": "Prepare Voice Message Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "chatId",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b2e67cce-d9f6-4d0e-a51b-8567eee46f90",
+      "name": "Prepare Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        896
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        1152
+      ],
+      "typeVersion": 1,
+      "id": "12fdaa85-c485-4108-b362-bc062fc50428",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Prepare Voice Message Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Voice Message Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Response": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "04c2c633-f902-4be6-ab12-32abeefe4412",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "704b4640f94c5f7646bcbd0bf57ea39ea0decc9702e19712aa221e83b3fe0f99"
+  },
+  "id": "IaQtM1Q03vobq1mB",
+  "tags": []
+}
